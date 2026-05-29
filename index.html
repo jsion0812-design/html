@@ -3,126 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>비에이텍 슬라이드쇼</title>
+    <title>(주)비에이텍 - 워터펌프 제작·설치·수리 전문기업</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <style>
-        /* CSS: 디자인 */
-        body, html {
-            margin: 0; padding: 0; height: 100%; overflow: hidden;
-            font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f9;
+        /* 기본 스타일 초기화 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Pretendard', sans-serif; color: #333; line-height: 1.6; background-color: #fff; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* 1. 헤더 & 네비게이션 */
+        header {
+            width: 100%; height: 80px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5%; position: fixed; top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;
         }
+        .logo h1 { color: #0056b3; font-size: 1.5rem; cursor: pointer; }
+        nav ul { display: flex; gap: 30px; }
+        nav ul li a { font-weight: 500; transition: color 0.3s; }
+        nav ul li a:hover { color: #00a8ff; }
 
-        /* 첫 화면 */
-        #start-screen {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; height: 100vh; text-align: center;
+        /* 2. 메인 히어로 섹션 */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                        url('https://images.unsplash.com/photo-1518152006812-edab29b069ac?auto=format&fit=crop&q=80&w=1920') no-repeat center/cover;
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; color: #fff; padding-top: 80px;
         }
+        .hero h2 { font-size: 3.5rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .hero p { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; }
 
-        #start-btn {
-            font-size: 100px; cursor: pointer; transition: transform 0.3s ease;
-            user-select: none; margin-bottom: 20px;
+        /* 버튼 그룹 */
+        .btn-group { display: flex; gap: 15px; }
+        .btn {
+            padding: 15px 40px; border-radius: 30px; font-weight: bold;
+            transition: all 0.3s; cursor: pointer; border: none; font-size: 1rem;
         }
+        .btn-more { background: #00a8ff; color: #fff; }
+        .btn-vision { background: #fff; color: #333; }
+        .btn:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-        #start-btn:hover { transform: scale(1.2); }
-
-        /* 슬라이드쇼 컨테이너 */
-        #slideshow-container {
+        /* 3. 슬라이드쇼 모달 (전체 화면) */
+        #slideshow-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.95); display: flex;
-            align-items: center; justify-content: center; z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
         }
-
-        .hidden { display: none !important; }
-
-        /* 이미지 스타일 */
-        .slide {
-            max-width: 95%; max-height: 90vh; display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        #slideshow-modal.active { display: flex; }
+        
+        .slide-wrapper { position: relative; width: 80%; max-width: 1000px; text-align: center; }
+        .slide { 
+            display: none; width: 100%; max-height: 80vh; 
+            object-fit: contain; border-radius: 8px;
         }
-
-        .slide.active { display: block; animation: fadeIn 0.5s ease; }
+        .slide.active { display: block; animation: fadeIn 0.4s ease; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
+            from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* 컨트롤 버튼 */
+        /* 슬라이드 컨트롤 */
         .nav-btn {
-            position: absolute; background: rgba(255, 255, 255, 0.15);
-            color: white; border: none; padding: 20px; cursor: pointer;
-            font-size: 30px; border-radius: 50%; transition: 0.3s;
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2); color: white; border: none;
+            width: 60px; height: 60px; cursor: pointer; font-size: 24px;
+            border-radius: 50%; transition: 0.3s;
+        }
+        .nav-btn:hover { background: rgba(0, 168, 255, 0.7); }
+        #prev-btn { left: -80px; }
+        #next-btn { right: -80px; }
+        #close-btn { 
+            position: absolute; top: -50px; right: 0; 
+            color: white; background: none; border: 1px solid #fff;
+            padding: 5px 15px; border-radius: 5px; cursor: pointer;
         }
 
-        .nav-btn:hover { background: rgba(255, 255, 255, 0.3); }
-        #prev-btn { left: 30px; }
-        #next-btn { right: 30px; }
-        #close-btn { 
-            top: 20px; right: 20px; font-size: 20px; border-radius: 5px;
-            background: rgba(255, 0, 0, 0.4); padding: 10px 15px;
+        /* 4. 푸터 */
+        footer { background: #222; color: #ccc; padding: 60px 5% 40px; font-size: 0.9rem; }
+        .footer-content {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px; max-width: 1200px; margin: 0 auto;
+        }
+        .footer-info h4 { color: #fff; margin-bottom: 20px; font-size: 1.1rem; }
+        .footer-info p { margin-bottom: 8px; }
+        .copyright {
+            text-align: center; margin-top: 40px; border-top: 1px solid #333;
+            padding-top: 20px; color: #666;
+        }
+
+        /* 반응형 대응 */
+        @media (max-width: 768px) {
+            .hero h2 { font-size: 2rem; }
+            #prev-btn { left: 10px; }
+            #next-btn { right: 10px; }
+            .nav-btn { width: 40px; height: 40px; font-size: 18px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="start-screen">
-        <div id="start-btn">💧</div>
-        <h2>비에이텍 친환경 비전</h2>
-        <p>물방울 이모티콘을 클릭하여 슬라이드를 확인하세요.</p>
-    </div>
-
-    <div id="slideshow-container" class="hidden">
-        <div id="slide-wrapper">
-            <img src="images/cam1.png" class="slide active">
-            <img src="images/cam2.png" class="slide">
-            <img src="images/cam3.png" class="slide">
-            <img src="images/cam4.png" class="slide">
-            <img src="images/cam5.png" class="slide">
-            <img src="images/cam6.png" class="slide">
-            <img src="images/cam7.png" class="slide">
-            <img src="images/cam8.png" class="slide">
+    <header>
+        <div class="logo">
+            <h1 onclick="location.reload()">(주)비에이텍</h1>
         </div>
+        <nav>
+            <ul>
+                <li><a href="intro.html">기업소개</a></li>
+                <li><a href="product.html">주요제품</a></li>
+                <li><a href="equipment.html">장비</a></li>
+                <li><a href="sales_history.html">업력</a></li>
+                <li><a href="map.html">찾아오시는 길</a></li>
+                <li><a href="inquiry.html">문의</a></li>
+            </ul>
+        </nav>
+    </header>
 
-        <button id="prev-btn" class="nav-btn">❮</button>
-        <button id="next-btn" class="nav-btn">❯</button>
-        <button id="close-btn" class="nav-btn">닫기 ✖</button>
+    <section class="hero">
+        <h2>물, 그 이상의 가치를 만듭니다</h2>
+        <p>(주)비에이텍은 워터펌프 제작, 설치, 수리 분야의 기술력을 바탕으로 깨끗한 수자원 관리를 선도합니다.</p>
+        <div class="btn-group">
+            <a href="product.html" class="btn btn-more">제품 둘러보기</a>
+            <button class="btn btn-vision" id="open-slideshow">💧 친환경 비전 보기</button>
+        </div>
+    </section>
+
+    <div id="slideshow-modal">
+        <div class="slide-wrapper">
+            <button id="close-btn">닫기 ✖</button>
+            <img src="images/cam1.png" class="slide active" alt="비전 이미지 1">
+            <img src="images/cam2.png" class="slide" alt="비전 이미지 2">
+            <img src="images/cam3.png" class="slide" alt="비전 이미지 3">
+            <img src="images/cam4.png" class="slide" alt="비전 이미지 4">
+            <img src="images/cam5.png" class="slide" alt="비전 이미지 5">
+            <img src="images/cam6.png" class="slide" alt="비전 이미지 6">
+            <img src="images/cam7.png" class="slide" alt="비전 이미지 7">
+            <img src="images/cam8.png" class="slide" alt="비전 이미지 8">
+            
+            <button id="prev-btn" class="nav-btn">❮</button>
+            <button id="next-btn" class="nav-btn">❯</button>
+        </div>
     </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h4>(주)비에이텍</h4>
+                <p>주소: 춘천시 퇴계로 1번지</p>
+                <p>담당자: aaa@naver.com</p>
+            </div>
+            <div class="footer-info">
+                <h4>Contact Us</h4>
+                <p>TEL : 033-248-1111</p>
+                <p>FAX : 033-248-1234</p>
+            </div>
+            <div class="footer-info">
+                <h4>Business</h4>
+                <p>워터펌프 제작 / 설치 / 수리 전문</p>
+                <p>상하수도 설비 공사 면허 보유</p>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2026 (주)비에이텍. All Rights Reserved.
+        </div>
+    </footer>
 
     <script>
-        /* JS: 동작 로직 */
-        const startBtn = document.getElementById('start-btn');
-        const slideshow = document.getElementById('slideshow-container');
-        const startScreen = document.getElementById('start-screen');
+        const modal = document.getElementById('slideshow-modal');
+        const openBtn = document.getElementById('open-slideshow');
+        const closeBtn = document.getElementById('close-btn');
         const slides = document.querySelectorAll('.slide');
         let currentIndex = 0;
 
-        // 슬라이드 쇼 열기
-        startBtn.onclick = () => {
-            slideshow.classList.remove('hidden');
-            startScreen.classList.add('hidden');
+        // 모달 열기
+        openBtn.onclick = () => {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // 스크롤 방지
         };
 
-        // 슬라이드 쇼 닫기
-        document.getElementById('close-btn').onclick = () => {
-            slideshow.classList.add('hidden');
-            startScreen.classList.remove('hidden');
+        // 모달 닫기
+        const closeModal = () => {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        };
+        closeBtn.onclick = closeModal;
+
+        // 배경 클릭 시 닫기
+        modal.onclick = (e) => {
+            if (e.target === modal) closeModal();
         };
 
-        // 이미지 전환 함수
+        // 슬라이드 전환
         function changeSlide(n) {
             slides[currentIndex].classList.remove('active');
             currentIndex = (currentIndex + n + slides.length) % slides.length;
             slides[currentIndex].classList.add('active');
         }
 
-        document.getElementById('next-btn').onclick = () => changeSlide(1);
-        document.getElementById('prev-btn').onclick = () => changeSlide(-1);
+        document.getElementById('next-btn').onclick = (e) => {
+            e.stopPropagation();
+            changeSlide(1);
+        };
+        document.getElementById('prev-btn').onclick = (e) => {
+            e.stopPropagation();
+            changeSlide(-1);
+        };
 
-        // 키보드 화살표 지원
+        // 키보드 제어
         document.addEventListener('keydown', (e) => {
-            if (!slideshow.classList.contains('hidden')) {
+            if (modal.classList.contains('active')) {
                 if (e.key === 'ArrowRight') changeSlide(1);
                 if (e.key === 'ArrowLeft') changeSlide(-1);
-                if (e.key === 'Escape') document.getElementById('close-btn').click();
+                if (e.key === 'Escape') closeModal();
             }
         });
     </script>
