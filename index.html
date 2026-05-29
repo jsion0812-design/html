@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>(주)비에이텍 - 물 그 이상의 가치</title>
     <style>
-        /* [기본 스타일] */
+        /* [기본 디자인] */
         body, html {
             margin: 0; padding: 0; height: 100%; width: 100%;
             font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
             background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         /* 첫 화면 중앙 정렬 */
@@ -42,11 +42,11 @@
             background-color: #003366; transform: translateY(-3px);
         }
 
-        /* [슬라이드쇼 팝업창] */
+        /* [슬라이드쇼 컨테이너] */
         #slideshow-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.95);
-            display: none; /* 기본적으로 숨김 */
+            display: none; /* JS로 제어 */
             align-items: center; justify-content: center; z-index: 1000;
         }
 
@@ -58,37 +58,38 @@
         .slide {
             max-width: 100%; max-height: 85vh; display: none;
             box-shadow: 0 10px 50px rgba(0,0,0,0.5);
-            border-radius: 10px;
+            border-radius: 8px; object-fit: contain;
         }
         .slide.active { display: block; animation: fadeIn 0.5s ease; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
+            from { opacity: 0; transform: scale(0.98); }
             to { opacity: 1; transform: scale(1); }
         }
 
         /* 네비게이션 버튼 */
         .nav-btn {
             position: absolute; background: rgba(255, 255, 255, 0.1);
-            color: white; border: none; padding: 20px; cursor: pointer;
-            font-size: 30px; border-radius: 50%; transition: 0.3s;
-            width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;
+            color: white; border: none; padding: 15px; cursor: pointer;
+            font-size: 24px; border-radius: 50%; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+            width: 60px; height: 60px;
         }
         .nav-btn:hover { background: rgba(255, 255, 255, 0.3); }
         
-        #prev-btn { left: -100px; }
-        #next-btn { right: -100px; }
+        #prev-btn { left: -70px; }
+        #next-btn { right: -70px; }
         #close-btn { 
-            top: -60px; right: 0; font-size: 18px; width: auto; height: auto;
-            border-radius: 5px; background: rgba(255, 0, 0, 0.6); padding: 10px 20px;
+            top: -50px; right: 0; font-size: 16px; width: auto; height: auto;
+            border-radius: 5px; background: rgba(255, 0, 0, 0.6); padding: 8px 15px;
         }
 
-        /* 모바일 대응 (버튼 위치 조정) */
-        @media (max-width: 1000px) {
-            #prev-btn { left: 10px; }
-            #next-btn { right: 10px; }
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            #prev-btn { left: 10px; bottom: -80px; }
+            #next-btn { right: 10px; bottom: -80px; }
             #close-btn { top: 20px; right: 20px; }
-            .nav-btn { width: 50px; height: 50px; font-size: 20px; }
+            .nav-btn { width: 50px; height: 50px; }
         }
 
         .hidden { display: none !important; }
@@ -99,18 +100,18 @@
     <div id="start-screen">
         <img id="start-btn-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBkPSJNMTAwIDU5LjQyQzk5Ljk3IDc5LjYyIDgzLjk3IDk2IDY0IDk2QzQ0LjA5IDk2IDI3Ljk4IDc5LjU4IDI3Ljk4IDU5LjM5QzI3Ljk4IDQ1LjU5IDM5LjEzIDI5LjgyIDU0LjEyIDMuOTFDNTYuNDcgMS45NCA1Ny45NiAwIDYwIDBDNjIuMDkgMCA2My42NiAxLjk4IDY1Ljk0IDQuMDFDNzguMDYgMzIuMzEgMTAwIDUxLjYzIDEwMCA1OS40MloiIGZpbGw9IiMwMDQ5OUUiLz48cGF0aCBkPSJNOTUuOTYgNTkuNDJDOTUuOTQgNzcuNSA4MC45NyA5MiA2My45OCA5MkM0NS4wMyA5MiAzMC45OCA3Ny40NyAzMC45OCA1OS4zOUMzMC45OCA0Ni42NCA0MS4xMiAzMS43OCA1NS4xMiA4LjczQzU2Ljg1IDYuOTIgNTguNTYgNSA2MC4wMyA1QzYxLjU5IDUgNjMuMzEgNy4wNCA2NC45OSA4Ljc5Qzc2LjIzIDM0Ljk1IDk1Ljk2IDUxLjgyIDk1Ljk2IDU5LjQyWiIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyKSIvPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhciIgeDE9IjYwLjI1IiB5MT0iNCIgeDI9IjYwLjI1IiB5Mj0iOTIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLWNvbG9yPSIjMDBEOTlFIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDA0OTlFIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PC9zdmc+" alt="물방울 아이콘">
         
-        <h1 style="color: #004a99; margin: 0; font-size: 2.5rem;">(주)비에이텍</h1>
-        <p style="font-size: 1.2rem; color: #666; margin: 10px 0 20px 0;">물, 그 이상의 가치를 디자인하다</p>
+        <h1 style="color: #004a99; margin: 0; font-size: 2.2rem;">(주)비에이텍</h1>
+        <p style="font-size: 1.1rem; color: #666; margin: 10px 0 20px 0;">물, 그 이상의 가치를 디자인하다</p>
         
-        <button class="view-button" id="main-view-btn">브로슈어 슬라이드 보기 ❯</button>
+        <button class="view-button" id="main-view-btn">회사 브로슈어 보기 ❯</button>
     </div>
 
     <div id="slideshow-container">
         <div class="slide-wrapper">
-            <img src="images/img1.jpg" class="slide active">
-            <img src="images/img2.jpg" class="slide">
-            <img src="images/img3.jpg" class="slide">
-            <img src="images/img4.png" class="slide">
+            <img src="images/img1.jpg" class="slide active" alt="브로슈어 1">
+            <img src="images/img2.jpg" class="slide" alt="브로슈어 2">
+            <img src="images/img3.jpg" class="slide" alt="브로슈어 3">
+            <img src="images/img4.png" class="slide" alt="브로슈어 4">
 
             <button id="prev-btn" class="nav-btn">❮</button>
             <button id="next-btn" class="nav-btn">❯</button>
@@ -124,7 +125,7 @@
         const slides = document.querySelectorAll('.slide');
         let currentIndex = 0;
 
-        // 열기
+        // 슬라이드 쇼 열기
         const openSlideshow = () => {
             slideshow.style.display = 'flex';
             startScreen.classList.add('hidden');
@@ -132,7 +133,7 @@
             showSlide(0);
         };
 
-        // 닫기
+        // 슬라이드 쇼 닫기
         const closeSlideshow = () => {
             slideshow.style.display = 'none';
             startScreen.classList.remove('hidden');
@@ -142,7 +143,7 @@
         document.getElementById('main-view-btn').onclick = openSlideshow;
         document.getElementById('close-btn').onclick = closeSlideshow;
 
-        // 슬라이드 전환
+        // 이미지 전환 로직
         function showSlide(index) {
             slides.forEach(s => s.classList.remove('active'));
             slides[index].classList.add('active');
@@ -153,10 +154,10 @@
             showSlide(currentIndex);
         }
 
-        document.getElementById('next-btn').onclick = () => changeSlide(1);
-        document.getElementById('prev-btn').onclick = () => changeSlide(-1);
+        document.getElementById('next-btn').onclick = (e) => { e.stopPropagation(); changeSlide(1); };
+        document.getElementById('prev-btn').onclick = (e) => { e.stopPropagation(); changeSlide(-1); };
 
-        // 키보드 지원
+        // 키보드 제어 (오른쪽/왼쪽 화살표, ESC)
         document.addEventListener('keydown', (e) => {
             if (slideshow.style.display === 'flex') {
                 if (e.key === 'ArrowRight') changeSlide(1);
@@ -164,6 +165,11 @@
                 else if (e.key === 'Escape') closeSlideshow();
             }
         });
+
+        // 배경 클릭 시 닫기
+        slideshow.onclick = (e) => {
+            if (e.target === slideshow) closeSlideshow();
+        };
     </script>
 </body>
 </html>
